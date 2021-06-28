@@ -5,5 +5,9 @@
   },
   "paraId": 2078,
   "startBlockParse": 67875,
-  "timeout": 5000
+  "timeout": 5000,
+  "server": {
+    "host": "127.0.0.1",
+    "port": "3015"
+  }
 }
