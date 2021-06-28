@@ -21,10 +21,16 @@ const Model = db.sequelize.define("list", {
 
 export default Model;
 
-// export async function getStatistic() {
-//   return "123";
-// }
 export async function getStatistic() {
+  const sql = `
+  select amountUnit, count from lists ORDER by block desc LIMIT 1
+  `;
+  return await db.sequelize.query(sql, {
+    // replacements,
+    type: db.sequelize.QueryTypes.SELECT,
+  });
+}
+export async function getHistory() {
   const sql = `
     select block, timestamp, count, amount, amountUnit, interval
     from
