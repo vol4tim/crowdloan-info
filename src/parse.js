@@ -45,7 +45,7 @@ export default async function main() {
     let timestamp;
     let fund;
     let keys;
-    const contributes = []
+    const contributes = [];
     if (block) {
       const blockHash = await api.rpc.chain.getBlockHash(block);
       const blockInfo = await api.rpc.chain.getBlock(blockHash);
@@ -53,18 +53,18 @@ export default async function main() {
         if (extrinsic.method.section === "timestamp") {
           timestamp = extrinsic.method.args[0].toNumber();
         }
-        if (extrinsic.method.section === "crowdloan" && extrinsic.method.method === "contribute") {
-          const data = extrinsic.method.toJSON().args
+        if (
+          extrinsic.method.section === "crowdloan" &&
+          extrinsic.method.method === "contribute"
+        ) {
+          const data = extrinsic.method.toJSON().args;
           if (data.index === paraId) {
             contributes.push({
               block,
               signer: extrinsic.signer.toHuman().Id,
               amount: data.value,
-              amountUnit: toUnit(
-                data.value,
-                api.registry.chainDecimals[0]
-              ),
-            })
+              amountUnit: toUnit(data.value, api.registry.chainDecimals[0]),
+            });
           }
         }
       });
@@ -79,16 +79,19 @@ export default async function main() {
       keys = await api.rpc.childstate.getKeys(childKey, "0x");
     }
     const contributors = keys.toArray();
-    return [{
-      block,
-      timestamp,
-      amount: hexToBn(fund.raised).toString(),
-      amountUnit: toUnit(
-        hexToBn(fund.raised).toString(),
-        api.registry.chainDecimals[0]
-      ),
-      count: contributors.length
-    }, contributes];
+    return [
+      {
+        block,
+        timestamp,
+        amount: hexToBn(fund.raised).toString(),
+        amountUnit: toUnit(
+          hexToBn(fund.raised).toString(),
+          api.registry.chainDecimals[0]
+        ),
+        count: contributors.length,
+      },
+      contributes,
+    ];
   }
 
   async function getCurrentBlock() {
@@ -117,7 +120,7 @@ export default async function main() {
         try {
           const result = await parseBlock(block);
           Model.create(result[0]);
-          ModelContributes.bulkCreate(result[1])
+          ModelContributes.bulkCreate(result[1]);
         } catch (_) {
           console.log("err", block);
           setTimeout(() => {
@@ -134,4 +137,4 @@ export default async function main() {
   }
   start();
 }
-main()
+// main()
