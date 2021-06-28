@@ -1,0 +1,9 @@
+{
+  "API": {
+    "endpoint": "wss://rpc.rococo-096.robonomics.network",
+    "types": {}
+  },
+  "paraId": 2078,
+  "startBlockParse": 67875,
+  "timeout": 5000
+}
