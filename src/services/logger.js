@@ -53,7 +53,8 @@ const logger = winston.createLogger({
 });
 
 process.on("unhandledRejection", (ex) => {
-  throw ex;
+  logger.error(ex.message);
+  // throw ex;
 });
 
 export default logger;

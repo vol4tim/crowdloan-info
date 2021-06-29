@@ -5,11 +5,18 @@ import { blake2AsU8a } from "@polkadot/util-crypto";
 import { API } from "../config.json";
 import Model from "./models/table";
 import ModelContributes from "./models/contributes";
+import logger from "./services/logger";
 import config from "./consts";
 
 let api;
 export async function initApi() {
   const provider = new WsProvider(API.endpoint);
+  provider.on("connected", () => {
+    logger.info("connected");
+  });
+  provider.on("disconnected", () => {
+    logger.warn("disconnected");
+  });
   api = await ApiPromise.create({
     provider,
     types: API.types,
@@ -113,17 +120,27 @@ export default async function main() {
   async function start() {
     if (!run) {
       run = true;
-      const currentBlock = await getCurrentBlock();
+      let currentBlock;
+      try {
+        currentBlock = await getCurrentBlock();
+      } catch (_) {
+        setTimeout(() => {
+          run = false;
+          start();
+        }, config.timeout);
+        return;
+      }
       const startBlock = await getStartBlock();
-      console.log(startBlock, currentBlock);
+      logger.info(`${startBlock} ${currentBlock}`);
       for (let block = startBlock; block <= currentBlock; block++) {
         try {
           const result = await parseBlock(block);
           Model.create(result[0]);
           ModelContributes.bulkCreate(result[1]);
         } catch (_) {
-          console.log("err", block);
+          logger.error("err", block);
           setTimeout(() => {
+            run = false;
             start();
           }, config.timeout);
           return;
